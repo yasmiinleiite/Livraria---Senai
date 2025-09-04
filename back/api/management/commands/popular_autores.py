@@ -49,7 +49,6 @@ class Command(BaseCommand):
             Autor.objects.bulk_create(objs, ignore_conflicts=True)
             # bulk_create está jogando no banco os dados sem conflito
             
-            self.stdout.write(self.style.SUCCESS(f'Criadodos: {len(objs)}'))
+            self.stdout.write(self.style.SUCCESS(f'Criados: {len(objs)}'))
                 
         # autor,s_autor,nasc,nacio
-        
