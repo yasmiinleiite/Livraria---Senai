@@ -31,7 +31,7 @@ def listar_autores(request):
 class AutoresView(ListCreateAPIView):
     queryset = Autor.objects.all()
     serializer_class = AutorSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['id'] # permite o filtro exato
     search_filter = ['autor'] # habilita a busca total de strings
@@ -48,7 +48,7 @@ class AutoresDetailView(RetrieveUpdateDestroyAPIView): # UPDATE e DELETE
 class EditorasView(ListCreateAPIView):
     queryset = Editora.objects.all()
     serializer_class = EditoraSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
 class EditorasDetailView(RetrieveUpdateDestroyAPIView):
     queryset = Editora.objects.all()
