@@ -31,7 +31,7 @@ class LivroSerializer(serializers.ModelSerializer):
             "isbn", 
             "descricao", 
             "idioma", 
-            "ano_publicacao", 
+            "ano", 
             "paginas", 
             "preco", 
             "estoque", 

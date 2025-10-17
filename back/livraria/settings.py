@@ -37,6 +37,7 @@ SIMPLE_JWT = {
 }
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -50,6 +51,12 @@ MIDDLEWARE = [
 
 CORS_ALLOW_ALL_ORIGINS = True
 
+# CORS_ALLOW_ALL_ORIGINS = [
+#     "http://localhost:4200",
+#     "http://127.0.0.1:4200",
+#     "http://localhost:8000",
+#     "http://127.0.0.1:8000",
+# ]
 
 ROOT_URLCONF = 'livraria.urls'
 

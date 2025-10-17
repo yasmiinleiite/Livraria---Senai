@@ -15,4 +15,6 @@ export interface Livro {
     disponivel: boolean,
     dimensoes?: string | null,
     peso: number,
+    capa?: string | null,
+    capa_url?: string | null,
 }

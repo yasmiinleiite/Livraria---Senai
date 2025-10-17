@@ -13,6 +13,6 @@ export const routes: Routes = [
     {path: 'home', component: HomeComponent},
     {path: 'autores', component: AutoresPage, canActivate: [authGuard]},
     {path: 'editoras', component: PublisherComponent, canActivate: [authGuard]},
-    {path: 'livros', component: BooksComponent, canActivate: [authGuard]}
-    {path: 'imagens', component: BooksComponent}
+    {path: 'livros', component: BooksComponent, canActivate: [authGuard]},
+    {path: 'imagens', component: ImagensComponent}
 ];

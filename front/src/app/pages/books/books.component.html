@@ -1,20 +1,171 @@
+<!--
+  max-w-5xl  → limita a largura máxima do container (≈ 64rem / 1024px).
+  mx-auto    → centraliza horizontalmente (margens laterais automáticas).
+  px-4       → padding horizontal de 1rem (esquerda/direita).
+  py-6       → padding vertical de 1.5rem (topo/base).
+-->
 <section class="max-w-5xl mx-auto px-4 py-6">
+  <!--
+    text-2xl     → tamanho de fonte grande (~24px).
+    font-semibold→ peso de fonte seminegrito.
+    mb-4         → margem inferior de 1rem.
+  -->
   <h1 class="text-2xl font-semibold mb-4">Livros</h1>
 
   @if (carregando()) {
+    <!-- text-gray-600 → texto cinza médio (melhor contraste para estados). -->
     <p class="text-gray-600">Carregando…</p>
   } @else if (erro()) {
+    <!-- text-red-600 → destaca erros em vermelho forte. -->
     <p class="text-red-600">{{ erro() }}</p>
   } @else {
+    <!--
+      grid              → ativa layout em grid.
+      grid-cols-1       → 1 coluna padrão (mobile).
+      sm:grid-cols-2    → 2 colunas a partir de breakpoint "sm".
+      gap-4             → espaçamento de 1rem entre itens do grid.
+    -->
     <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       @for (a of livros(); track a.id) {
+        <!-- "track a.id": define a chave de rastreamento (tracking key). 
+         O Angular usa esse identificador estável para reutilizar o 
+         DOM de cada item quando a lista muda, evitando recriar elementos 
+         e melhorando performance. -->
+        <!--
+          rounded-xl        → cantos arredondados grandes.
+          border            → aplica borda de 1px.
+          border-gray-200   → cor da borda (cinza claro).
+          bg-white          → fundo branco.
+          shadow-sm         → sombra leve.
+          p-4               → padding interno de 1rem.
+        -->
         <li class="rounded-xl border border-gray-200 bg-white shadow-sm p-4">
 
+          <!-- ################## Capa (clique para enviar/trocar) ################## -->
+          <!--
+            mb-3     → margem inferior 0.75rem.
+            relative → referência para posicionar o botão "Alterar capa" absolutamente dentro.
+          -->
+          <div class="mb-3 relative">
+            @if (capaSrc(a)) {
+              <!--
+                justify-self-center → centraliza o item na célula do grid (se o parent for grid).
+                w-[220px]           → largura fixa de 220px (arbitrária). (*)
+                h-68                → NÃO existe no scale padrão do Tailwind. Use h-[272px] ou h-72. (*)
+                rounded-lg          → cantos arredondados médios.
+                border              → borda de 1px.
+                border-gray-100     → borda cinza muito clara.
+                loading="lazy"      → nativo HTML (adiar carregamento).
+                (*) Dica: para valor fora da escala, prefira sintaxe arbitrária: h-[272px]
+              -->
+              <img
+                [src]="capaSrc(a)!"
+                [alt]="'Capa de ' + a.titulo"
+                class="justify-self-center w-[220px] h-[272px] h-68 rounded-lg border border-gray-100"
+                fetchpriority="high"
+                width="220" height="272"
+                decoding="async"
+              />
+
+              <!--
+                absolute       → posiciona em relação ao parent relativo.
+                top-2 right-2  → desloca 0.5rem do topo e da direita.
+                inline-flex    → caixa inline com flexbox.
+                items-center   → alinha verticalmente ícones/textos no centro.
+                gap-1          → espaçamento horizontal 0.25rem entre conteúdos.
+                rounded-md     → cantos arredondados (médio).
+                bg-white/90    → fundo branco com 90% de opacidade.
+                px-2 py-1      → padding x=0.5rem, y=0.25rem.
+                text-xs        → fonte pequena.
+                font-medium    → peso médio.
+                shadow         → sombra padrão.
+                border         → borda de 1px (usa cor padrão do tema).
+                cursor-pointer → cursor de “mãozinha”.
+                hover:bg-white → ao passar o mouse, fundo branco sólido.
+              -->
+              <label
+                class="absolute top-2 right-2 inline-flex items-center gap-1 rounded-md bg-white/90 px-2 py-1 text-xs font-medium shadow border cursor-pointer hover:bg-white"
+                [for]="fileInputId(a.id)"
+              >
+                Alterar capa
+              </label>
+            } @else {
+              <!--
+                justify-self-center → centraliza a área do placeholder no grid.
+                mb-3                → margem inferior 0.75rem.
+                w-[220px]           → largura fixa 220px (arbitrária).
+                h-68                → NÃO existe no scale padrão (use h-[272px] ou h-72).
+                grid place-items-center → centraliza o conteúdo (texto) no meio do box.
+                rounded-lg          → cantos arredondados.
+                bg-gray-50          → fundo cinza muito claro.
+                border              → borda 1px sólida.
+                border-dashed       → estilo tracejado.
+                border-gray-300     → cinza médio para a borda.
+                text-gray-400       → texto cinza claro.
+                text-sm             → fonte pequena.
+                cursor-pointer      → cursor de “mãozinha”.
+                hover:bg-gray-100   → realce leve ao passar o mouse.
+              -->
+              <label
+                class="justify-self-center mb-3 w-[220px] h-68 grid place-items-center rounded-lg bg-gray-50 border border-dashed border-gray-300 text-gray-400 text-sm cursor-pointer hover:bg-gray-100"
+                [for]="fileInputId(a.id)"
+              >
+                Sem capa — clique para enviar
+              </label>
+            }
+
+            <!--
+              type="file" accept="image/*" → input de arquivo apenas para imagens.
+              class="hidden"              → oculta o input (usado via label).
+            -->
+            <input
+              type="file"
+              accept="image/*"
+              class="hidden"
+              [id]="fileInputId(a.id)"
+              (change)="onSelect($event, a.id)"
+            />
+
+            @if (statusUpload(a.id) === 'up') {
+              <!--
+                absolute            → posiciona em relação ao parent relativo.
+                bottom-2 right-2    → 0.5rem da base/direita.
+                text-[11px]         → tamanho de fonte arbitrário (11px).
+                bg-white/90         → fundo branco 90% opacidade.
+                border              → borda 1px.
+                rounded             → cantos levemente arredondados.
+                px-2 py-0.5         → padding x=0.5rem, y=0.125rem.
+              -->
+              <div class="absolute bottom-2 right-2 text-[11px] bg-white/90 border rounded px-2 py-0.5">Enviando…</div>
+            } @else if (statusUpload(a.id) === 'ok') {
+              <div class="absolute bottom-2 right-2 text-[11px] bg-white/90 border rounded px-2 py-0.5">Capa atualizada</div>
+            } @else if (statusUpload(a.id) === 'err') {
+              <!-- text-red-600 → destaca a palavra “Falha” em vermelho. -->
+              <div class="absolute bottom-2 right-2 text-[11px] bg-white/90 border rounded px-2 py-0.5 text-red-600">Falha ao enviar</div>
+            }
+          </div>
+
+          <!-- ################## Conteúdo do card ################## -->
+          <!--
+            text-base      → tamanho de fonte base (~16px).
+            font-semibold  → peso de fonte seminegrito (título).
+            text-gray-900  → texto quase preto.
+          -->
           <div class="text-base font-semibold text-gray-900">
             {{ a.titulo }}
+            <!--
+              text-gray-500 → subtítulo em cinza para hierarchy.
+              font-normal   → peso normal para contraste com o título.
+            -->
             @if (a.subtitulo) { <span class="text-gray-500 font-normal"> — {{ a.subtitulo }}</span> }
           </div>
 
+          <!--
+            mt-1        → margem superior 0.25rem.
+            text-sm     → fonte pequena para metadados.
+            text-gray-600→ cor cinza média.
+            space-x-2   → espaçamento horizontal de 0.5rem entre spans irmãos.
+          -->
           <div class="mt-1 text-sm text-gray-600 space-x-2">
             @if (a.autor) { <span>• <em>{{ a.autor }}</em></span> }
             @if (a.editora) { <span>• {{ a.editora }}</span> }
@@ -22,76 +173,81 @@
           </div>
 
           @if (a.descricao) {
+            <!--
+              mt-2            → margem superior 0.5rem.
+              text-sm         → fonte pequena.
+              leading-relaxed → altura de linha mais confortável para leitura.
+              text-gray-700   → cor do texto (cinza escuro).
+            -->
             <p class="mt-2 text-sm leading-relaxed text-gray-700">
               {{ a.descricao }}
             </p>
           }
 
-          <dl class="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-            @if (a.idioma) {
-              <div>
-                <dt class="text-gray-500">Idioma</dt>
-                <dd class="text-gray-900">{{ a.idioma }}</dd>
-              </div>
-            }
-            @if (a.ano) {
-              <div>
-                <dt class="text-gray-500">Ano</dt>
-                <dd class="text-gray-900">{{ a.ano }}</dd>
-              </div>
-            }
-            @if (a.paginas) {
-              <div>
-                <dt class="text-gray-500">Páginas</dt>
-                <dd class="text-gray-900">{{ a.paginas }}</dd>
-              </div>
-            }
-            @if (a.preco) {
-              <div>
-                <dt class="text-gray-500">Preço</dt>
-                <dd class="text-gray-900">{{ a.preco }}</dd>
-              </div>
-            }
-            @if (a.estoque) {
-              <div>
-                <dt class="text-gray-500">Estoque</dt>
-                <dd class="text-gray-900">{{ a.estoque }}</dd>
-              </div>
-            }
-            @if (a.desconto) {
-              <div>
-                <dt class="text-gray-500">Desconto</dt>
-                <dd class="text-gray-900">{{ a.desconto }}</dd>
-              </div>
-            }
-            @if (a.disponivel) {
-              <div class="col-span-2">
-                <dt class="sr-only">Disponibilidade</dt>
-                <dd>
-                  <span class="inline-flex items-center rounded-full bg-green-100 text-green-700 px-2 py-0.5 text-xs font-medium">
-                    Disponível
-                  </span>
-                </dd>
-              </div>
-            }
-            @if (a.dimensoes) {
-              <div>
-                <dt class="text-gray-500">Dimensões</dt>
-                <dd class="text-gray-900">{{ a.dimensoes }}</dd>
-              </div>
-            }
-            @if (a.peso) {
-              <div>
-                <dt class="text-gray-500">Peso</dt>
-                <dd class="text-gray-900">{{ a.peso }}</dd>
-              </div>
-            }
-          </dl>
+          <!-- ### Bloco detalhes + (espaço para imagem à direita se desejar reaplicar) ### -->
+          <!--
+            mt-3             → margem superior 0.75rem.
+            grid             → layout em grid.
+            grid-cols-1      → 1 coluna padrão (mobile).
+            sm:grid-cols-3   → 3 colunas em telas ≥ sm.
+            gap-3            → espaçamento de 0.75rem entre células.
+            items-start      → alinha os conteúdos pelo topo.
+          -->
+          <div class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3 items-start">
+            <!--
+              sm:col-span-2 → o bloco de detalhes ocupa 2 colunas no ≥ sm.
+              grid          → cria subgrid para as linhas de detalhes.
+              grid-cols-1   → 1 coluna (cada item numa linha).
+              gap-y-2       → espaçamento vertical de 0.5rem entre linhas.
+              text-sm       → fonte pequena.
+            -->
+            <dl class="sm:col-span-2 grid grid-cols-1 gap-y-2 text-sm">
+              <!-- text-gray-500 → rótulos em cinza (menos ênfase). -->
+              @if (a.idioma) { <div><dt class="text-gray-500">Idioma: {{ a.idioma }}</dt></div> }
+              @if (a.ano) { <div><dt class="text-gray-500">Ano: {{ a.ano }}</dt></div> }
+              @if (a.paginas) { <div><dt class="text-gray-500">Páginas: {{ a.paginas }}</dt></div> }
+              @if (a.preco) { <div><dt class="text-gray-500">Preço: {{ a.preco }}</dt></div> }
+              @if (a.estoque) { <div><dt class="text-gray-500">Estoque: {{ a.estoque }}</dt></div> }
+              @if (a.desconto) { <div><dt class="text-gray-500">Desconto: {{ a.desconto }}</dt></div> }
+              @if (a.dimensoes) { <div><dt class="text-gray-500">Dimensões: {{ a.dimensoes }}</dt></div> }
+              @if (a.peso) { <div><dt class="text-gray-500">Peso: {{ a.peso }}</dt></div> }
+              <!--
+                col-span-2 → ocupa largura total do subgrid (quando houver 2 colunas).
+                sr-only    → acessibilidade: esconde visualmente, mas mantém para leitores de tela.
+                chip "Disponível":
+                  inline-flex       → alinha ícone/texto no eixo.
+                  items-center      → centraliza verticalmente.
+                  rounded-full      → pílula.
+                  bg-green-100      → fundo verde claro.
+                  text-green-700    → texto verde escuro.
+                  px-2 py-1.5       → padding interno pequeno.
+                  text-xs           → fonte bem pequena.
+                  font-medium       → peso médio.
+              -->
+              @if (a.disponivel) {
+                <div class="col-span-2">
+                  <dt class="sr-only">Disponibilidade</dt>
+                  <dd>
+                    <span class="inline-flex items-center rounded-full bg-green-100 text-green-700 px-2 py-1.5 text-xs font-medium">
+                      Disponível
+                    </span>
+                  </dd>
+                </div>
+              }
+            </dl>
+
+            <!-- (Se quiser recolocar a miniatura à direita, use um container + object-contain como vimos) -->
+          </div>
         </li>
       }
     </ul>
   }
 
+  <!--
+    mt-4               → margem superior 1rem.
+    text-indigo-600    → link em índigo.
+    hover:underline    → sublinha no hover.
+  -->
   <nav class="mt-4">
     <a routerLink="/home" class="text-indigo-600 hover:underline">Voltar ao início</a>
   </nav>
