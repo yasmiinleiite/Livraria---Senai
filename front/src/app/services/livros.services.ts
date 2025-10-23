@@ -19,8 +19,8 @@ export class LivrosService {
   private api = (environment.apiBase ?? '').replace(/\/+$/, '');
 
   // suas rotas CBV:
-  private baseList = `${this.api}/api/livros`;   // sem barra final
-  private baseDetail = `${this.api}/api/livro`;  // singular
+  private baseList = `${this.api}/api/livros/`;   
+  private baseDetail = `${this.api}/api/livros`;  
 
   listar(q?: LivroQuery): Observable<Livro[]> {
     let params = new HttpParams();

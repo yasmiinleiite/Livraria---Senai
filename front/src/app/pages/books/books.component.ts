@@ -28,8 +28,7 @@ export class BooksComponent {
   private upStatus = new Map<number, 'idle' | 'up' | 'ok' | 'err'>();
 
   constructor() {
-    console.log('Token de acesso:', this.auth.token());
-
+    
     // Carregar lista inicial de livros
     this.svc.listar({ ordering: 'titulo' }).subscribe({
       next: (data) => {
