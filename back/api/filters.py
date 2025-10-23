@@ -1,20 +1,17 @@
-########### Caso queira um filtro duplo ################################
 import django_filters as df
 from django.db.models import Q
-from .models import Autor
+from .models import Autor, Livro 
 
-class AutorFilter(df.FilterSet):
-    # ?nome=jorge  → procura em nome OU sobrenome (parcial, sem diferenciar maiúsc/minúsc)
-    autor = df.CharFilter(method='filter_nome')
+class LivroFilter(df.filterset):
+    id = df.NumberFilter(field_name='id' , lookup_expr='exact')
+    titulo = df.CharFilter(field_name='titulo', lookup_expr='icontains')
 
-    # ?nacionalidade=brasileira → compara case-insensitive (ex.: "Brasileira" == "brasileira")
-    nacio = df.CharFilter(field_name='nacio', lookup_expr='iexact')
-
-    def filter_nome(self, queryset, name, value):
-        if not value:
-            return queryset
-        return queryset.filter(Q(autor__icontains=value) | Q(s_autor__icontains=value))
-
-    class Meta:
-        model = Autor
-        fields = []  # usamos os campos customizados acima
+    def filter_autor(self, qs, name, value):
+        if not value: 
+            return qs
+        return qs.filter(Q(autor__nome__icontains=value) | Q(autor__s_autor__icontains=value))
+    
+    class Meta: 
+        model = Livro
+        fields = []
+    
